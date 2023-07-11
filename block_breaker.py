@@ -14,7 +14,43 @@ class Block(pg.sprite.Sprite):
         self.rect.center = x,y
     def update(self,screen: pg.Surface):
         screen.blit(self.img,self.rect)
+
+
+class Bar(pg.sprite.Sprite):
+    """
+    バーに関するクラス
+    """
+    delta = {
+        pg.K_LEFT: -1,
+        pg.K_RIGHT: +1,
+    }
+    def __init__(self, xy: tuple[int, int]) -> None:
+        """
+        プレイヤーが操作するバーを描画
+        引数1 x: バーのx座標
+        引数2 y: バーのy座標
+        """
+        self.width = WIDTH/5
+        self.height = HEIGHT/20
+        self.wid_dec = 0
+        self.width -= self.wid_dec
+        self.speed = 10
+        color = (255, 255, 255)
+        self.rect = self.image.get_rect()
+        self.image = pg.Surface((self.width, self.height))
+        pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
     
+    def update(self, key_lst: list[bool], screen: pg.Surface):
+        """
+        押下キーに応じてバーを移動させる
+        引数1 key_lst：押下キーの真理値リスト
+        引数2 screen：画面Surface
+        """
+        if self.rect.left >= 0 or WIDTH > self.rect.right:
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    self.rect.move_ip(+self.speed*mv, 0)
+
 
 def main():
     pg.display.set_caption("ブロック崩し改")
