@@ -73,7 +73,7 @@ class Ball(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = x,y
         self.rad = math.pi/4
-        self.vx = -math.cos(self.rad)
+        self.vx = math.cos(self.rad)
         self.vy = -math.sin(self.rad)
         self.speed = 2
     
@@ -128,7 +128,7 @@ def main():
         balls.draw(screen)
         
         # 画面の更新
-        pg.display.update()
+        pg.display.flip()
 if __name__ == "__main__":
     pg.init()
     main()
