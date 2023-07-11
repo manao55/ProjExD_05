@@ -14,18 +14,39 @@ class Block(pg.sprite.Sprite):
         self.rect.center = x,y
     def update(self,screen: pg.Surface):
         screen.blit(self.img,self.rect)
-    
 
+
+class Sound():
+    """
+    サウンドに関するクラス
+    """
+    def __init__(self):
+        self.BoundSE = pg.mixer.Sound("ex05/sounds/boundSE.mp3")
+        self.BGM = pg.mixer.Sound("ex05/sounds/maou_bgm_8bit28.mp3")
+        
+    def playBoundSE(self):
+        """
+        ボールが反射したときに実行してください
+        """
+        self.SE.play()
+        
+    def playBGM(self, time:int):
+        self.BGM.play(time)
+        
+    
 def main():
     pg.display.set_caption("ブロック崩し改")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     blocks = pg.sprite.Group()
     ball = pg.sprite.Group()
+    sound = Sound()
     
     # 初期ブロックの追加
     for i in range(1,10):
         for j in range(1,10):
             blocks.add(Block(100, 25,200+(110*i),100+(30*j)))
+    
+    sound.playBGM(-1)  # BGM再生
     
     while True:
         key_lst = pg.key.get_pressed()
