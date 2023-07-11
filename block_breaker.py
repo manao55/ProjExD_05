@@ -29,15 +29,15 @@ class Block(pg.sprite.Sprite):
     def update(self, screen: pg.Surface):
         screen.blit(self.image, self.rect)
 
-    def collision(self,screen):
+    def collision(self,screen):#ボールとの衝突時
         self.life -= 1
         if self.life <= 0:
             return
         self.image.fill(self.color_list[3 - (self.life)])
         self.update(screen)
 
-    def handle_event(self, event,screen):
-        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+    def handle_event(self, event,screen):#デバッグ用関数
+        if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:#ボールクラスが現状存在しないためクリックにて対応
             if self.rect.collidepoint(event.pos):
                 if self.life >0:
                     self.collision(screen)
@@ -56,13 +56,11 @@ def main():
             blocks.add(Block(i, j, 3))
 
     while True:
-        key_lst = pg.key.get_pressed()
-
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
             else:
-                for block in blocks.copy():
+                for block in blocks.copy():#デバッグ用であるためマージ時削除
                     block.handle_event(event,screen)
 
         # ブロックの更新と描画
