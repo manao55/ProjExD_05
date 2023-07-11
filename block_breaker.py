@@ -30,6 +30,7 @@ class Bar(pg.sprite.Sprite):
         引数1 x: バーのx座標
         引数2 y: バーのy座標
         """
+        super().__init__()
         self.width = WIDTH/5
         self.height = HEIGHT - xy[1]
         self.wid_dec = 0    #バーの幅の変位(特定モード時)
@@ -67,7 +68,7 @@ def main():
         for j in range(1,10):
             blocks.add(Block(100, 25,200+(110*i),100+(30*j)))
     
-    bar.add(Bar((WIDTH*2/5, 10)))
+    bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
     
     while True:
         key_lst = pg.key.get_pressed()
@@ -78,7 +79,7 @@ def main():
 
         # ブロックの更新と描画
         blocks.update(screen)
-        bar.update()
+        bar.update(key_lst, screen)
         
         # 画面の更新
         pg.display.flip()
