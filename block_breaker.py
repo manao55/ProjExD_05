@@ -75,7 +75,7 @@ class Ball(pg.sprite.Sprite):
         self.rad = math.pi/4
         self.vx = math.cos(self.rad)
         self.vy = -math.sin(self.rad)
-        self.speed = 2
+        self.speed = 5
     
     def update(self):
         """
