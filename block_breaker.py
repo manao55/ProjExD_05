@@ -6,7 +6,7 @@ B_BLANK = 15
 B_LEFT = 30
 B_TOP = 10
 import math
-
+import time
 def check_bound_out(obj: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内か画面外かを判定し，真理値タプルを返す
@@ -211,8 +211,8 @@ class Bar(pg.sprite.Sprite):
     バーに関するクラス
     """
     delta = {
-        pg.K_LEFT: -1,
-        pg.K_RIGHT: +1,
+        pg.K_LEFT: -0.1,
+        pg.K_RIGHT: +0.1,
     }
     def __init__(self, xy: tuple[int, int]) -> None:
         """
@@ -254,7 +254,8 @@ def main():
     balls = pg.sprite.Group()
     score = Score()
     balls.add(Ball(10, WIDTH/2, HEIGHT-100))  #ボールを生成する(半径10)
-    
+    bar = pg.sprite.Group()
+    bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
     # 初期ブロックの追加
     for i in range(10):
         for j in range(8):
@@ -268,8 +269,6 @@ def main():
     
     while True:
     #bg_img = pg.draw.rect(pg.Surface((WIDTH,HEIGHT)), (0,0,0), (0, 0, WIDTH, HEIGHT))
-        bar = pg.sprite.Group()
-        bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
         key_lst = pg.key.get_pressed()
         #screen.blit(bg_img, [0, 0])
         for event in pg.event.get():
@@ -279,8 +278,6 @@ def main():
                 for block in blocks.copy():#デバッグ用であるためマージ時削除
                     block.handle_event(event,screen)
         screen.blit(bg_img, [0, 0])  #背景の描写、必要に応じて消してください
-        if len(balls) == 0:
-            return 0
         #ブロックとの衝突判定
         for ball in balls:
             for block in blocks:
@@ -292,7 +289,9 @@ def main():
                     ball.vy *= -1
                     block.collision(screen)
                     score.cal_score(point=1)
-
+        if len(blocks) <= 0:
+            time.sleep(3)
+            return 0
         # ブロックの更新と描画
         screen.fill((0, 0, 0))  # 画面をクリア
         blocks.update(screen)
