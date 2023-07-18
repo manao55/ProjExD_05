@@ -30,7 +30,7 @@ class Sound():
 
     def playBGM(self, time:int):
         """
-        BGMを再生する
+        BGMを再生
         引数に-1を指定することでループ再生できる
         """
         self.BGM.play(time)
@@ -53,13 +53,13 @@ class Sound():
         """
         敵が弾を発射した時に再生
         引数0でミサイルの発射音、引数1で雷の発射音
-        引数はbulletクラスのnumを渡す 
+        引数は発射時に指定するnumを渡す 
         """
         self.ShotSE[num].play()
     
     def playDamageSE(self):
         """
-        被弾音を時に再生
+        被弾音を再生
         被弾時に実行
         """
         self.DamageSE.play()
