@@ -1,6 +1,6 @@
 import pygame as pg
 import sys
-
+F_P_SIZE = 30
 WIDTH, HEIGHT = 1200, 900
 B_BLANK = 15
 B_LEFT = 30
@@ -57,6 +57,7 @@ class Block(pg.sprite.Sprite):
         引数3 life:ブロックの耐久値
         """
         super().__init__()
+
         self.life = life
         self.color_list = [(0, 255, 0), (255, 255, 0), (255, 0, 0)]
         self.image = pg.Surface((100, 20))  # 100*25のブロックを生成
@@ -82,7 +83,39 @@ class Block(pg.sprite.Sprite):
                     self.collision(screen)
                 if self.life <= 0:
                     self.kill()
-
+class Score():
+    """
+    初期化メソッド
+    """
+    def __init__(self):
+        self.font  = pg.font.SysFont("hgep006", F_P_SIZE)
+        self.point = 0
+    """
+    スコア計算
+    """
+    def cal_score(self, point):
+        self.point += point * 100
+    """
+    スピード更新メソッド
+    """
+    def update_speed(self):
+        if self.point < 1000:
+            time_scale = 1.0
+        elif self.point < 2000:
+            time_scale = 1.5
+        elif self.point < 3000:
+            time_scale = 2.0
+        else:
+            time_scale = 2.5
+        # タイムスケールを設定する
+        # set_time_scale(time_scale)
+        # aaa
+    """
+    スコア描画
+    """
+    def draw(self, surface):
+        text = self.font.render("{:04d}".format(self.point), True, (63,255,63))
+        surface.blit(text, [10, 5])
 
 class Ball(pg.sprite.Sprite):
     """
@@ -160,7 +193,6 @@ def main():
 
         # 画面の更新
         pg.display.flip()
-
 
 if __name__ == "__main__":
     pg.init()
