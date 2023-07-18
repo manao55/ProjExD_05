@@ -278,6 +278,8 @@ def main():
                 for block in blocks.copy():#デバッグ用であるためマージ時削除
                     block.handle_event(event,screen)
         screen.blit(bg_img, [0, 0])  #背景の描写、必要に応じて消してください
+        if len(balls) <= 0:
+                return 0 
         #ブロックとの衝突判定
         for ball in balls:
             for block in blocks:
