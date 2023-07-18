@@ -169,7 +169,7 @@ class Bar(pg.sprite.Sprite):
         super().__init__()
         self.width = WIDTH/5
         self.height = HEIGHT - xy[1]
-        self.speed = 10
+        self.speed = 2
         color = (255, 255, 255)
         self.image = pg.Surface((self.width, self.height))
         self.image.fill(color)
@@ -188,6 +188,11 @@ class Bar(pg.sprite.Sprite):
             for k, mv in __class__.delta.items():
                 if key_lst[k]:
                     self.rect.move_ip(+self.speed*mv, 0)
+        if check_bound_out(self.rect) != (True, True):
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    self.rect.move_ip(-self.speed*mv, 0)
+
         screen.blit(self.image, self.rect)
 class Sound():
     """
@@ -241,6 +246,8 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.Surface((WIDTH, HEIGHT))  #背景を追加、必要に応じて消してください
     bg_img.fill((0, 0, 0))
+    bar = pg.sprite.Group()
+    bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
     blocks = pg.sprite.Group()
     balls = pg.sprite.Group()  
     balls.add(Ball(10, WIDTH/2, HEIGHT-100))  #ボールを生成する(半径10)
@@ -258,8 +265,6 @@ def main():
     
     while True:
     #bg_img = pg.draw.rect(pg.Surface((WIDTH,HEIGHT)), (0,0,0), (0, 0, WIDTH, HEIGHT))
-        bar = pg.sprite.Group()
-        bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
         key_lst = pg.key.get_pressed()
         #screen.blit(bg_img, [0, 0])
         for event in pg.event.get():
