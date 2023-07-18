@@ -43,6 +43,7 @@ class Score():
             time_scale = 2.5
         # タイムスケールを設定する
         # set_time_scale(time_scale)
+        # aaa
     """
     スコア描画
     """
