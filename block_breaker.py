@@ -152,6 +152,55 @@ class Ball(pg.sprite.Sprite):
             self.kill()
 
 
+class Sound():
+    """
+    サウンドに関するクラス
+    """
+    def __init__(self):
+        self.BGM = pg.mixer.Sound("ex05/sounds/maou_bgm_8bit28.mp3")
+        self.BoundSE = pg.mixer.Sound("ex05/sounds/select01.mp3")
+        self.ExpSE = pg.mixer.Sound("ex05/sounds/explosion03.mp3")
+        self.ShotSE = [pg.mixer.Sound("ex05/sounds/hit01.mp3"),
+                       pg.mixer.Sound("ex05/sounds/laser_beam.mp3")]
+        self.DamageSE = pg.mixer.Sound("ex05/sounds/hit06.mp3")
+
+    def playBGM(self, time:int):
+        """
+        BGMを再生
+        引数に-1を指定することでループ再生できる
+        """
+        self.BGM.play(time)
+        
+    def playBoundSE(self):
+        """
+        ボールの反射音を再生
+        ボールが反射したときに実行
+        """
+        self.BoundSE.play()
+        
+    def playExpSE(self):
+        """
+        敵の爆発音を再生
+        敵を倒した時に実行
+        """
+        self.ExpSE.play()
+        
+    def playShotSE(self, num:int):
+        """
+        敵が弾を発射した時に再生
+        引数0でミサイルの発射音、引数1で雷の発射音
+        引数は発射時に指定するbulletNumを渡す 
+        """
+        self.ShotSE[num].play()
+    
+    def playDamageSE(self):
+        """
+        被弾音を再生
+        被弾時に実行
+        """
+        self.DamageSE.play()
+    
+    
 def main():
     pg.display.set_caption("ブロック崩し改")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -167,6 +216,12 @@ def main():
         for j in range(8):
             blocks.add(Block(i, j, 3))
 
+    sound = Sound()
+    
+
+    
+    sound.playBGM(-1)  # BGM再生
+    
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
