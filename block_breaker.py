@@ -124,7 +124,9 @@ class Sound():
     サウンドに関するクラス
     """
     def __init__(self):
-        self.BGM = pg.mixer.Sound("ex05/sounds/maou_bgm_8bit28.mp3")
+        #pg.init()
+        pg.mixer.init()
+        self.BGM = pg.mixer.Sound("maou_bgm_8bit28.mp3")
         self.BoundSE = pg.mixer.Sound("ex05/sounds/select01.mp3")
         self.ExpSE = pg.mixer.Sound("ex05/sounds/explosion03.mp3")
         self.ShotSE = [pg.mixer.Sound("ex05/sounds/hit01.mp3"),
