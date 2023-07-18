@@ -71,8 +71,8 @@ class Block(pg.sprite.Sprite):
 
     def collision(self,screen):#ボールとの衝突時
         self.life -= 1
-        Score.cal_score(1)
         if self.life <= 0:
+            self.kill()
             return
         self.image.fill(self.color_list[3 - (self.life)])
         self.update(screen)
@@ -146,10 +146,8 @@ class Ball(pg.sprite.Sprite):
         """
         if check_bound_out(self.rect)[0] == 0:
             self.vx *= -1
-            Sound.playBoundSE(self)
         elif check_bound_out(self.rect)[1] == 0:
             self.vy *= -1
-            Sound.playBoundSE(self)
         self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
         if self.rect.bottom >= HEIGHT:
             self.kill()
@@ -281,8 +279,12 @@ def main():
             for block in blocks:
                 if check_bound_rects(ball.rect, block.rect)[0] == 1:
                     ball.vx *= -1
+                    block.collision(screen)
+                    score.cal_score(point=1)
                 elif check_bound_rects(ball.rect, block.rect)[1] == 1:
                     ball.vy *= -1
+                    block.collision(screen)
+                    score.cal_score(point=1)
 
         # ブロックの更新と描画
         screen.fill((0, 0, 0))  # 画面をクリア
