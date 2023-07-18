@@ -118,79 +118,7 @@ class Score():
         text = self.font.render("{:04d}".format(self.point), True, (63,255,63))
         surface.blit(text, [10, 880])
 
-class Ball(pg.sprite.Sprite):
-    """
-    ボールに関するクラス
-    """
-    def __init__(self, r:int, x:int, y:int):
-        """
-        ボールSurfaceを作成する
-        引数１ r：半径
-        引数２、３ x,y：ボールの中心座標
-        """
-        super().__init__()
-        self.image = pg.Surface((r*2, r*2))
-        pg.draw.circle(self.image, (255, 255, 255), (r, r), r)
-        self.image.set_colorkey((0, 0, 0))
-        self.rect = self.image.get_rect()
-        self.rect.center = x,y
-        self.rad = math.pi/4
-        self.vx = math.cos(self.rad)
-        self.vy = -math.sin(self.rad)
-        self.speed = 2.5
-    
-    def update(self):
-        """
-        ボールを速度ベクトルself.vx, self.vyに基づき移動させる
-        check_bound_out関数によって画面外に出たかどうか判定すし、速度を変更する。
-        """
-        if check_bound_out(self.rect)[0] == 0:
-            self.vx *= -1
-        elif check_bound_out(self.rect)[1] == 0:
-            self.vy *= -1
-        self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
-        if self.rect.bottom >= HEIGHT:
-            self.kill()
-            return 0
 
-
-class Bar(pg.sprite.Sprite):
-    """
-    バーに関するクラス
-    """
-    delta = {
-        pg.K_LEFT: -1,
-        pg.K_RIGHT: +1,
-    }
-    def __init__(self, xy: tuple[int, int]) -> None:
-        """
-        プレイヤーが操作するバーを描画
-        引数 x: バーのx座標
-             y: バーのy座標
-        """
-        super().__init__()
-        self.width = WIDTH/5
-        self.height = HEIGHT - xy[1]
-        self.speed = 10
-        color = (255, 255, 255)
-        self.image = pg.Surface((self.width, self.height))
-        self.image.fill(color)
-        self.rect = self.image.get_rect()
-        self.rect.center = xy
-        pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
-    
-    
-    def update(self, key_lst: list[bool], screen: pg.Surface):
-        """
-        押下キーに応じてバーを移動させる
-        引数1 key_lst：押下キーの真理値リスト
-        引数2 screen：画面Surface
-        """
-        if self.rect.left >= 0 or WIDTH > self.rect.right:
-            for k, mv in __class__.delta.items():
-                if key_lst[k]:
-                    self.rect.move_ip(+self.speed*mv, 0)
-        screen.blit(self.image, self.rect)
 class Sound():
     """
     サウンドに関するクラス
@@ -238,6 +166,85 @@ class Sound():
         被弾時に実行
         """
         self.DamageSE.play()
+
+
+class Ball(pg.sprite.Sprite):
+    """
+    ボールに関するクラス
+    """
+    def __init__(self, r:int, x:int, y:int):
+        """
+        ボールSurfaceを作成する
+        引数１ r：半径
+        引数２、３ x,y：ボールの中心座標
+        """
+        super().__init__()
+        self.image = pg.Surface((r*2, r*2))
+        pg.draw.circle(self.image, (255, 255, 255), (r, r), r)
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = x,y
+        self.rad = math.pi/4
+        self.vx = math.cos(self.rad)
+        self.vy = -math.sin(self.rad)
+        self.speed = 2.5
+    
+    def update(self, sound: Sound):
+        """
+        ボールを速度ベクトルself.vx, self.vyに基づき移動させる
+        check_bound_out関数によって画面外に出たかどうか判定すし、速度を変更する。
+        """
+        if check_bound_out(self.rect)[0] == 0:
+            self.vx *= -1
+            sound.playBoundSE()
+        elif check_bound_out(self.rect)[1] == 0:
+            self.vy *= -1
+            sound.playBoundSE()
+        self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
+        if self.rect.bottom >= HEIGHT:
+            self.kill()
+            return 0
+
+
+class Bar(pg.sprite.Sprite):
+    """
+    バーに関するクラス
+    """
+    delta = {
+        pg.K_LEFT: -1,
+        pg.K_RIGHT: +1,
+    }
+    def __init__(self, xy: tuple[int, int]) -> None:
+        """
+        プレイヤーが操作するバーを描画
+        引数 x: バーのx座標
+             y: バーのy座標
+        """
+        super().__init__()
+        self.width = WIDTH/5
+        self.height = HEIGHT - xy[1]
+        self.speed = 10
+        color = (255, 255, 255)
+        self.image = pg.Surface((self.width, self.height))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.center = xy
+        pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
+    
+    
+    def update(self, key_lst: list[bool], screen: pg.Surface):
+        """
+        押下キーに応じてバーを移動させる
+        引数1 key_lst：押下キーの真理値リスト
+        引数2 screen：画面Surface
+        """
+        if self.rect.left >= 0 or WIDTH > self.rect.right:
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    self.rect.move_ip(+self.speed*mv, 0)
+        screen.blit(self.image, self.rect)
+
+
 def main():
     pg.display.set_caption("ブロック崩し改")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -290,7 +297,7 @@ def main():
         screen.fill((0, 0, 0))  # 画面をクリア
         blocks.update(screen)
         blocks.draw(screen)
-        balls.update()  #ボールの更新と描画
+        balls.update(sound)  #ボールの更新と描画
         balls.draw(screen)
         # バーの更新と描画
         bar.update(key_lst, screen)
