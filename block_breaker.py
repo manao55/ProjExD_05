@@ -289,6 +289,11 @@ def main():
                     ball.vy *= -1
                     block.collision(screen)
                     score.cal_score(point=1)
+            for a_bar in bar:
+                if check_bound_rects(ball.rect, a_bar.rect)[0] == 1:
+                    ball.vx *= -1
+                elif check_bound_rects(ball.rect, a_bar.rect)[1] == 1:
+                    ball.vy *= -1
         if len(blocks) <= 0:
             time.sleep(3)
             return 0
