@@ -27,19 +27,18 @@ class Bar(pg.sprite.Sprite):
     def __init__(self, xy: tuple[int, int]) -> None:
         """
         プレイヤーが操作するバーを描画
-        引数1 x: バーのx座標
-        引数2 y: バーのy座標
+        引数 x: バーのx座標
+             y: バーのy座標
         """
         super().__init__()
         self.width = WIDTH/5
         self.height = HEIGHT - xy[1]
-        self.wid_dec = 0    #バーの幅の変位(特定モード時)
-        self.width -= self.wid_dec
         self.speed = 10
         color = (255, 255, 255)
         self.image = pg.Surface((self.width, self.height))
+        self.image.fill(color)
         self.rect = self.image.get_rect()
-        self.rect.center = (xy[0]+self.width/2, xy[1]+self.height/2)
+        self.rect.center = xy
         pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
     
     
@@ -59,6 +58,7 @@ class Bar(pg.sprite.Sprite):
 def main():
     pg.display.set_caption("ブロック崩し改")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
+    #bg_img = pg.draw.rect(pg.Surface((WIDTH,HEIGHT)), (0,0,0), (0, 0, WIDTH, HEIGHT))
     blocks = pg.sprite.Group()
     ball = pg.sprite.Group()
     bar = pg.sprite.Group()
@@ -72,14 +72,17 @@ def main():
     
     while True:
         key_lst = pg.key.get_pressed()
-        
+        #screen.blit(bg_img, [0, 0])
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
 
         # ブロックの更新と描画
         blocks.update(screen)
+        # バーの更新と描画
         bar.update(key_lst, screen)
+        bar.draw(screen)
         
         # 画面の更新
         pg.display.flip()
