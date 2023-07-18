@@ -6,7 +6,7 @@ B_BLANK = 15
 B_LEFT = 30
 B_TOP = 10
 import math
-
+import time
 def check_bound_out(obj: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内か画面外かを判定し，真理値タプルを返す
@@ -72,6 +72,7 @@ class Block(pg.sprite.Sprite):
     def collision(self,screen):#ボールとの衝突時
         self.life -= 1
         if self.life <= 0:
+            self.kill()
             return
         self.image.fill(self.color_list[3 - (self.life)])
         self.update(screen)
@@ -115,85 +116,9 @@ class Score():
     """
     def draw(self, surface):
         text = self.font.render("{:04d}".format(self.point), True, (63,255,63))
-        surface.blit(text, [10, 5])
-
-class Ball(pg.sprite.Sprite):
-    """
-    ボールに関するクラス
-    """
-    def __init__(self, r:int, x:int, y:int):
-        """
-        ボールSurfaceを作成する
-        引数１ r：半径
-        引数２、３ x,y：ボールの中心座標
-        """
-        super().__init__()
-        self.image = pg.Surface((r*2, r*2))
-        pg.draw.circle(self.image, (255, 255, 255), (r, r), r)
-        self.image.set_colorkey((0, 0, 0))
-        self.rect = self.image.get_rect()
-        self.rect.center = x,y
-        self.rad = math.pi/4
-        self.vx = math.cos(self.rad)
-        self.vy = -math.sin(self.rad)
-        self.speed = 5
-    
-    def update(self):
-        """
-        ボールを速度ベクトルself.vx, self.vyに基づき移動させる
-        check_bound_out関数によって画面外に出たかどうか判定すし、速度を変更する。
-        """
-        if check_bound_out(self.rect)[0] == 0:
-            self.vx *= -1
-        elif check_bound_out(self.rect)[1] == 0:
-            self.vy *= -1
-        self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
-        if self.rect.bottom >= HEIGHT:
-            self.kill()
+        surface.blit(text, [10, 880])
 
 
-class Bar(pg.sprite.Sprite):
-    """
-    バーに関するクラス
-    """
-    delta = {
-        pg.K_LEFT: -1,
-        pg.K_RIGHT: +1,
-    }
-    def __init__(self, xy: tuple[int, int]) -> None:
-        """
-        プレイヤーが操作するバーを描画
-        引数 x: バーのx座標
-             y: バーのy座標
-        """
-        super().__init__()
-        self.width = WIDTH/5
-        self.height = HEIGHT - xy[1]
-        self.speed = 2
-        color = (255, 255, 255)
-        self.image = pg.Surface((self.width, self.height))
-        self.image.fill(color)
-        self.rect = self.image.get_rect()
-        self.rect.center = xy
-        pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
-    
-    
-    def update(self, key_lst: list[bool], screen: pg.Surface):
-        """
-        押下キーに応じてバーを移動させる
-        引数1 key_lst：押下キーの真理値リスト
-        引数2 screen：画面Surface
-        """
-        if self.rect.left >= 0 or WIDTH > self.rect.right:
-            for k, mv in __class__.delta.items():
-                if key_lst[k]:
-                    self.rect.move_ip(+self.speed*mv, 0)
-        if check_bound_out(self.rect) != (True, True):
-            for k, mv in __class__.delta.items():
-                if key_lst[k]:
-                    self.rect.move_ip(-self.speed*mv, 0)
-
-        screen.blit(self.image, self.rect)
 class Sound():
     """
     サウンドに関するクラス
@@ -241,6 +166,90 @@ class Sound():
         被弾時に実行
         """
         self.DamageSE.play()
+
+
+class Ball(pg.sprite.Sprite):
+    """
+    ボールに関するクラス
+    """
+    def __init__(self, r:int, x:int, y:int):
+        """
+        ボールSurfaceを作成する
+        引数１ r：半径
+        引数２、３ x,y：ボールの中心座標
+        """
+        super().__init__()
+        self.image = pg.Surface((r*2, r*2))
+        pg.draw.circle(self.image, (255, 255, 255), (r, r), r)
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = x,y
+        self.rad = math.pi/4
+        self.vx = math.cos(self.rad)
+        self.vy = -math.sin(self.rad)
+        self.speed = 2.5
+    
+    def update(self, sound: Sound):
+        """
+        ボールを速度ベクトルself.vx, self.vyに基づき移動させる
+        check_bound_out関数によって画面外に出たかどうか判定すし、速度を変更する。
+        """
+        if check_bound_out(self.rect)[0] == 0:
+            self.vx *= -1
+            sound.playBoundSE()
+        elif check_bound_out(self.rect)[1] == 0:
+            self.vy *= -1
+            sound.playBoundSE()
+        self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
+        if self.rect.bottom >= HEIGHT:
+            self.kill()
+            return 0
+
+
+class Bar(pg.sprite.Sprite):
+    """
+    バーに関するクラス
+    """
+    delta = {
+        pg.K_LEFT: -0.1,
+        pg.K_RIGHT: +0.1,
+    }
+    def __init__(self, xy: tuple[int, int]) -> None:
+        """
+        プレイヤーが操作するバーを描画
+        引数 x: バーのx座標
+             y: バーのy座標
+        """
+        super().__init__()
+        self.width = WIDTH/5
+        self.height = HEIGHT - xy[1]
+        self.speed = 2
+        color = (255, 255, 255)
+        self.image = pg.Surface((self.width, self.height))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.rect.center = xy
+        pg.draw.rect(self.image, color, (xy[0], xy[1], self.width, self.height))
+    
+    
+    def update(self, key_lst: list[bool], screen: pg.Surface):
+        """
+        押下キーに応じてバーを移動させる
+        引数1 key_lst：押下キーの真理値リスト
+        引数2 screen：画面Surface
+        """
+        if self.rect.left >= 0 or WIDTH > self.rect.right:
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    self.rect.move_ip(+self.speed*mv, 0)
+        if check_bound_out(self.rect) != (True, True):
+            for k, mv in __class__.delta.items():
+                if key_lst[k]:
+                    self.rect.move_ip(-self.speed*mv, 0)
+
+        screen.blit(self.image, self.rect)
+
+
 def main():
     pg.display.set_caption("ブロック崩し改")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -249,9 +258,11 @@ def main():
     bar = pg.sprite.Group()
     bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
     blocks = pg.sprite.Group()
-    balls = pg.sprite.Group()  
+    balls = pg.sprite.Group()
+    score = Score()
     balls.add(Ball(10, WIDTH/2, HEIGHT-100))  #ボールを生成する(半径10)
-    
+    bar = pg.sprite.Group()
+    bar.add(Bar((WIDTH*2/5, HEIGHT-10)))
     # 初期ブロックの追加
     for i in range(10):
         for j in range(8):
@@ -274,24 +285,30 @@ def main():
                 for block in blocks.copy():#デバッグ用であるためマージ時削除
                     block.handle_event(event,screen)
         screen.blit(bg_img, [0, 0])  #背景の描写、必要に応じて消してください
-
         #ブロックとの衝突判定
         for ball in balls:
             for block in blocks:
                 if check_bound_rects(ball.rect, block.rect)[0] == 1:
                     ball.vx *= -1
+                    block.collision(screen)
+                    score.cal_score(point=1)
                 elif check_bound_rects(ball.rect, block.rect)[1] == 1:
                     ball.vy *= -1
-
+                    block.collision(screen)
+                    score.cal_score(point=1)
+        if len(blocks) <= 0:
+            time.sleep(3)
+            return 0
         # ブロックの更新と描画
         screen.fill((0, 0, 0))  # 画面をクリア
         blocks.update(screen)
         blocks.draw(screen)
-        balls.update()  #ボールの更新と描画
+        balls.update(sound)  #ボールの更新と描画
         balls.draw(screen)
         # バーの更新と描画
         bar.update(key_lst, screen)
         bar.draw(screen)
+        score.draw(screen)
         
         # 画面の更新
         pg.display.flip()
