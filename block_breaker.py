@@ -71,6 +71,7 @@ class Block(pg.sprite.Sprite):
 
     def collision(self,screen):#ボールとの衝突時
         self.life -= 1
+        Score.cal_score(1)
         if self.life <= 0:
             return
         self.image.fill(self.color_list[3 - (self.life)])
@@ -115,7 +116,7 @@ class Score():
     """
     def draw(self, surface):
         text = self.font.render("{:04d}".format(self.point), True, (63,255,63))
-        surface.blit(text, [10, 5])
+        surface.blit(text, [10, 880])
 
 class Ball(pg.sprite.Sprite):
     """
@@ -136,7 +137,7 @@ class Ball(pg.sprite.Sprite):
         self.rad = math.pi/4
         self.vx = math.cos(self.rad)
         self.vy = -math.sin(self.rad)
-        self.speed = 5
+        self.speed = 2.5
     
     def update(self):
         """
@@ -145,11 +146,14 @@ class Ball(pg.sprite.Sprite):
         """
         if check_bound_out(self.rect)[0] == 0:
             self.vx *= -1
+            Sound.playBoundSE(self)
         elif check_bound_out(self.rect)[1] == 0:
             self.vy *= -1
+            Sound.playBoundSE(self)
         self.rect.move_ip(+self.speed*self.vx, +self.speed*self.vy)
         if self.rect.bottom >= HEIGHT:
             self.kill()
+            return 0
 
 
 class Bar(pg.sprite.Sprite):
@@ -242,7 +246,8 @@ def main():
     bg_img = pg.Surface((WIDTH, HEIGHT))  #背景を追加、必要に応じて消してください
     bg_img.fill((0, 0, 0))
     blocks = pg.sprite.Group()
-    balls = pg.sprite.Group()  
+    balls = pg.sprite.Group()
+    score = Score()
     balls.add(Ball(10, WIDTH/2, HEIGHT-100))  #ボールを生成する(半径10)
     
     # 初期ブロックの追加
@@ -269,7 +274,8 @@ def main():
                 for block in blocks.copy():#デバッグ用であるためマージ時削除
                     block.handle_event(event,screen)
         screen.blit(bg_img, [0, 0])  #背景の描写、必要に応じて消してください
-
+        if len(balls) == 0:
+            return 0
         #ブロックとの衝突判定
         for ball in balls:
             for block in blocks:
@@ -287,6 +293,7 @@ def main():
         # バーの更新と描画
         bar.update(key_lst, screen)
         bar.draw(screen)
+        score.draw(screen)
         
         # 画面の更新
         pg.display.flip()
