@@ -292,6 +292,11 @@ def main():
                     ball.vy *= -1
                     block.collision(screen)
                     score.cal_score(point=1)
+            for a_bar in bar:
+                if check_bound_rects(ball.rect, a_bar.rect)[0] == 1:
+                    ball.vx *= -1
+                elif check_bound_rects(ball.rect, a_bar.rect)[1] == 1:
+                    ball.vy *= -1
 
         # ブロックの更新と描画
         screen.fill((0, 0, 0))  # 画面をクリア
